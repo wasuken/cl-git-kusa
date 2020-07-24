@@ -2,7 +2,8 @@
   :version "0.1.0"
   :author ""
   :license ""
-  :depends-on ()
+  :depends-on ("cl-rainbow" "cl-json" "dexador"
+							"cl-ppcre" "chronicity" "mylib" "local-time")
   :components ((:module "src"
                 :components
                 ((:file "main"))))

@@ -5,7 +5,9 @@ exec ros -Q -- $0 "$@"
 |#
 (progn ;;init forms
   (ros:ensure-asdf)
-  #+quicklisp(ql:quickload '(:cl-rainbow :cl-json :dexador :cl-git-kusa) :silent t)
+  #+quicklisp(ql:quickload '(:cl-rainbow :cl-json :dexador
+							 :cl-git-kusa :cl-ppcre :chronicity
+							 :mylib :local-time) :silent t)
   )
 
 (defpackage :ros.script.run.3804556733
