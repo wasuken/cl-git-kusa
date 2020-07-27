@@ -4,6 +4,7 @@
 (in-package :cl-git-kusa)
 
 (defvar *user-event-url-format* "https://api.github.com/users/~a/events?page=~a&per_page=100")
+(defvar *space* " ")
 
 (defun date-groupby (events table)
   (loop for e in events
@@ -23,24 +24,32 @@
 		 (chronicity:parse "last sunday"
 						   :now (chronicity:parse "1 years ago")))
 		(cnt 0)
-		(end 372))
-	(loop for i in (mylib:range 0 end 7)
+		(max-weeks 54))
+	(loop for i from 0 to 6
 	   do (progn
-			(format t "~a:"
+			(format t "~a ~~ ~a:"
 					(local-time:format-timestring
 					 nil
 					 (chronicity:parse (format nil "~a days after" i)
 									   :now one-years-ago-last-sunday)
+					 :format '((:year 4) #\- (:month 2) #\- (:day 2)))
+					(local-time:format-timestring
+					 nil
+					 (chronicity:parse (format nil "~a days after" (- (* max-weeks 7) (- 6 i)))
+									   :now one-years-ago-last-sunday)
 					 :format '((:year 4) #\- (:month 2) #\- (:day 2))))
-			(loop for j from 0 to 6
-			   do (let ((datetime-string (local-time:format-timestring
-										  nil
-										  (chronicity:parse (format nil "~a days after" (+ i j))
-															:now one-years-ago-last-sunday)
-										  :format '((:year 4) #\- (:month 2) #\- (:day 2)))))
+			(loop for j from 1 to max-weeks
+			   do (let* ((dt-str (format nil
+									  "~a days after"
+									  (+ i (* j 7))))
+						 (datetime-string (local-time:format-timestring
+										   nil
+										   (chronicity:parse dt-str
+															 :now one-years-ago-last-sunday)
+										   :format '((:year 4) #\- (:month 2) #\- (:day 2)))))
 					(if (gethash datetime-string table)
-						(format t "[w]")
-						(format t "[-]"))
+						(format t (cl-rainbow:background :green *space*))
+						(format t (cl-rainbow:background :white *space*)))
 					(incf cnt)))
 			(format t "~%")))))
 
@@ -61,7 +70,6 @@
 		(setf resp body)))
 	(json:decode-json-from-string resp)))
 
-;; blah blah blah.
 (defun stats (username)
   (setf chronicity:*now* (chronicity:parse (mylib:get-format-date)))
   (setf cl-rainbow:*enabled* t)
